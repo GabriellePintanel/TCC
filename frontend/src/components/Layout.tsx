@@ -1,4 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
+
 import logoImg from "../assets/img/gaucho-dancing.png";
 
 export const Layout = () => {
@@ -36,45 +38,7 @@ const Navbar = () => {
 
       <div id="navbarBasicExample" className="navbar-menu">
         <div className="navbar-end">
-          <Link className="navbar-item" to="/">
-            Início
-          </Link>
-
-          <Link className="navbar-item" to="/about">
-            Sobre o CTG
-          </Link>
-
-          <Link className="navbar-item" to="/calendar">
-            Calendário
-          </Link>
-
-          <Link className="navbar-item" to="/rodeio">
-            Notas e Gráficos do Rodeio
-          </Link>
-
-          <div className="navbar-item has-dropdown is-hoverable">
-            <a className="navbar-link">Mais</a>
-
-            <div className="navbar-dropdown">
-              <Link className="navbar-item" to="/group">
-                O Grupo
-              </Link>
-              <Link className="navbar-item" to="/pilcha">
-                Pilcha
-              </Link>
-              <Link className="navbar-item" to="/profile">
-                Meu Perfil
-              </Link>
-            </div>
-          </div>
-
-          <div className="navbar-item">
-            <div className="buttons">
-              <a className="button is-primary">
-                <strong>Entrar</strong>
-              </a>
-            </div>
-          </div>
+          <OidcMenu />
         </div>
       </div>
     </nav>
@@ -106,4 +70,83 @@ const Footer = () => {
       </div>
     </footer>
   );
+};
+
+const OidcMenu = () => {
+  const auth = useAuth();
+
+  if (auth.isAuthenticated) {
+    return (
+      <>
+        <Link className="navbar-item" to="/">
+          Início
+        </Link>
+
+        <Link className="navbar-item" to="/about">
+          Sobre o CTG
+        </Link>
+
+        <Link className="navbar-item" to="/calendar">
+          Calendário
+        </Link>
+
+        <Link className="navbar-item" to="/rodeio">
+          Notas e Gráficos do Rodeio
+        </Link>
+
+        <div className="navbar-item has-dropdown is-hoverable">
+          <a className="navbar-link">Mais</a>
+
+          <div className="navbar-dropdown">
+            <Link className="navbar-item" to="/group">
+              O Grupo
+            </Link>
+            <Link className="navbar-item" to="/pilcha">
+              Pilcha
+            </Link>
+            <Link className="navbar-item" to="/profile">
+              Meu Perfil
+            </Link>
+          </div>
+        </div>
+
+        <div className="navbar-item">
+          <div className="buttons">
+            {auth.user?.profile.preferred_username}{" "}
+            <button className="button is-primary"
+              onClick={() => void auth.removeUser()}
+            >
+              <strong>Sair</strong>
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  } else {
+    return (
+      <>
+        <Link className="navbar-item" to="/">
+          Início
+        </Link>
+
+        <Link className="navbar-item" to="/about">
+          Sobre o CTG
+        </Link>
+
+        <Link className="navbar-item" to="/calendar">
+          Calendário
+        </Link>
+
+        <div className="navbar-item">
+          <div className="buttons">
+            <button className="button is-primary"
+              onClick={() => void auth.signinRedirect()}
+            >
+              <strong>Entrar</strong>
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  };
 };
